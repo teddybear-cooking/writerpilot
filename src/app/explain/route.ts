@@ -1,5 +1,5 @@
-import { NextResponse } from 'next/server';
-import { OpenAI } from 'openai';
+import { NextResponse } from "next/server";
+import { OpenAI } from "openai";
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -7,14 +7,30 @@ const openai = new OpenAI({
 
 export async function POST(req: Request) {
   try {
-    const { text } = await req.json();
+    const { message } = await req.json();
+
     const completion = await openai.chat.completions.create({
-      model: 'gpt-4',
-      messages: [{ role: 'user', content: `Explain this text: ${text}` }],
+      model: "gpt-4",
+      messages: [
+        {
+          role: "system",
+          content: "You continue user input with a short, natural phrase suitable for an essay or story. Do not repeat the user's words.",
+        },
+        {
+          role: "user",
+          content: `Continue this sentence: "${message}"`,
+        },
+      ],
+      temperature: 0.7, // creative but not random
+      max_tokens: 12, // short continuation (a few words)
     });
 
-    return NextResponse.json({ explanation: completion.choices[0].message.content });
+    const output = completion.choices[0].message.content?.trim();
+    return NextResponse.json({ completion: output });
   } catch (error) {
-    return NextResponse.json({ error: 'Error in processing the text.' }, { status: 500 });
+    return NextResponse.json(
+      { error: "Error generating continuation." },
+      { status: 500 }
+    );
   }
 }

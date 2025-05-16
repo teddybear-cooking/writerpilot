@@ -12,7 +12,7 @@ export async function POST(req: Request) {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "google/gemma-2-9b-it:free",
+        model: "meta-llama/llama-4-maverick:free",
         messages: [
           { role: "system", content: "You are a helpful AI assistant." },
           { role: "user", content: message },
